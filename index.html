@@ -3,29 +3,33 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>A Nossa Transformação • De Sala Velha ao Nosso Lar</title>
+  <title>Autentifuturo • Remodelações & Restauros</title>
+  <link rel="icon" type="image/webp" href="logo-autentifuturo.webp">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- FIXED FULLSCREEN VIEWPORT (Never scrolls out of view, always fixed at the top) -->
+  <!-- FIXED FULLSCREEN VIEWPORT (Pinned permanently at the top) -->
   <div class="fixed-viewport" id="viewport">
     
     <!-- Video / Frame Canvas Renderer -->
     <canvas id="video-canvas" class="video-canvas"></canvas>
     
-    <!-- Subtle Vignette & Contrast Overlay -->
+    <!-- Cinematic Vignette & Branding Overlay -->
     <div class="viewport-overlay"></div>
 
-    <!-- Top Navigation Header -->
+    <!-- Top Navigation Header (Autentifuturo Identity) -->
     <header class="top-nav">
-      <div class="brand">
-        <span class="brand-sparkle">✨</span>
-        <span class="brand-title">A Nossa História</span>
-      </div>
+      <a href="https://autentifuturo.pt" target="_blank" rel="noopener" class="brand" title="Autentifuturo - Remodelações & Restauros">
+        <img src="logo-autentifuturo.webp" alt="Autentifuturo" class="brand-logo-img">
+        <div class="brand-text-group">
+          <span class="brand-title">AUTENTIFUTURO</span>
+          <span class="brand-subtitle">Remodelações & Restauros</span>
+        </div>
+      </a>
 
       <div class="nav-actions">
         <button id="btn-sound" class="nav-btn" title="Ativar Som" aria-label="Som">
@@ -43,12 +47,18 @@
 
         <button id="btn-compare" class="nav-btn" title="Comparação Direta">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="20" x2="18" y2="10"></line>
-            <line x1="12" y1="20" x2="12" y2="4"></line>
-            <line x1="6" y1="20" x2="6" y2="14"></line>
+            <polyline points="16 3 21 3 21 8"></polyline>
+            <line x1="4" y1="20" x2="21" y2="3"></line>
+            <polyline points="21 16 21 21 16 21"></polyline>
+            <line x1="15" y1="15" x2="21" y2="21"></line>
           </svg>
           <span class="nav-btn-text">Antes vs Depois</span>
         </button>
+
+        <a href="https://autentifuturo.pt" target="_blank" rel="noopener" class="nav-btn btn-cta" title="Pedir Orçamento na Autentifuturo">
+          <span>Pedir Orçamento</span>
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+        </a>
 
         <button id="btn-fullscreen" class="nav-btn icon-only" title="Ecrã Inteiro">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -73,16 +83,16 @@
         <div class="caption-glass">
           <div class="caption-badge">
             <span class="badge-dot"></span>
-            <span>01 / 07 • Ponto de Partida</span>
+            <span>01 / 07 • Diagnóstico Inicial</span>
           </div>
           <h1 class="caption-title">A sala está velha...</h1>
           <p class="caption-desc">
-            Paredes gastas pelo tempo, mobiliário antigo e a certeza de que precisávamos de dar uma nova vida a este lugar.
+            Paredes gastas pelo tempo, materiais desatualizados e a necessidade clara de uma intervenção profunda e profissional de restauro.
           </p>
           <div class="caption-action-hint">
             <div class="scroll-indicator">
               <span class="mouse-icon"><span class="mouse-wheel"></span></span>
-              <span>Faz scroll ou clica no Play para ver a transformação em vídeo</span>
+              <span>Faz scroll ou clica em "Reproduzir Vídeo" para ver as obras</span>
             </div>
           </div>
         </div>
@@ -91,13 +101,13 @@
       <!-- Card 1 -->
       <article class="caption-card" data-step="1">
         <div class="caption-glass">
-          <div class="caption-badge warning">
-            <span class="badge-dot warning"></span>
-            <span>02 / 07 • Primeiras Obras</span>
+          <div class="caption-badge brand">
+            <span class="badge-dot brand"></span>
+            <span>02 / 07 • Demolição & Estrutura</span>
           </div>
           <h2 class="caption-title">Entram as obras!</h2>
           <p class="caption-desc">
-            Demolição, pó no ar e muito esforço. Paredes partidas para abrir espaço e reconstruir tudo do zero com dedicação.
+            Equipa em ação. Demolição técnica, abertura de vãos, remoção de entulho e preparação de infraestruturas elétricas e canalizações.
           </p>
         </div>
       </article>
@@ -107,11 +117,11 @@
         <div class="caption-glass">
           <div class="caption-badge success">
             <span class="badge-dot success"></span>
-            <span>03 / 07 • Conclusão</span>
+            <span>03 / 07 • 1ª Fase Concluída</span>
           </div>
           <h2 class="caption-title">A sala fica pronta!</h2>
           <p class="caption-desc">
-            A poeira assentou e a sala ganhou uma nova vida. Limpa, renovada e pronta para novas memórias.
+            Paredes estucadas e pintadas, chão impecável e acabamentos limpos. O espaço respira luminosidade e conforto renovado.
           </p>
         </div>
       </article>
@@ -121,11 +131,11 @@
         <div class="caption-glass">
           <div class="caption-badge modern">
             <span class="badge-dot modern"></span>
-            <span>04 / 07 • Nova Ambição</span>
+            <span>04 / 07 • Projeto Contemporâneo</span>
           </div>
           <h2 class="caption-title">"Vamos modernizar!"</h2>
           <p class="caption-desc">
-            Não ficamos por aqui. Queremos elevar a fasquia: linhas contemporâneas, materiais nobres e design de topo.
+            Não ficamos pelo básico. Elevamos o padrão com marcenaria por medida, arquitetura de iluminação e materiais contemporâneos de excelência.
           </p>
         </div>
       </article>
@@ -133,13 +143,13 @@
       <!-- Card 4 -->
       <article class="caption-card" data-step="4">
         <div class="caption-glass">
-          <div class="caption-badge warning">
-            <span class="badge-dot warning"></span>
+          <div class="caption-badge brand">
+            <span class="badge-dot brand"></span>
             <span>05 / 07 • Obras de Requinte</span>
           </div>
           <h2 class="caption-title">De volta às obras...</h2>
           <p class="caption-desc">
-            Novos acabamentos técnicos, iluminação arquitetónica e mobiliário sofisticado em pleno desenvolvimento.
+            Instalação de soluções à medida, sancas de luz indireta, carpintarias nobres e rigor absoluto em cada milímetro de detalhe.
           </p>
         </div>
       </article>
@@ -149,11 +159,11 @@
         <div class="caption-glass love">
           <div class="caption-badge love">
             <span class="badge-heart">💍</span>
-            <span>06 / 07 • A Grande Decisão</span>
+            <span>06 / 07 • O Grande Passo</span>
           </div>
           <h2 class="caption-title">"Vamos casar!" 💍</h2>
           <p class="caption-desc">
-            Mais do que remodelar uma casa, decidimos unir as nossas vidas para sempre! A preparar o nosso ninho de amor.
+            A remodelação tornou-se no palco de algo ainda mais bonito: a celebração do nosso amor e a preparação do ninho para a vida a dois.
           </p>
         </div>
       </article>
@@ -163,33 +173,36 @@
         <div class="caption-glass celebration">
           <div class="caption-badge gold">
             <span class="badge-star">✨</span>
-            <span>07 / 07 • O Nosso Lar</span>
+            <span>07 / 07 • O Nosso Lar de Sonho</span>
           </div>
           <h2 class="caption-title">O nosso lar de sonho. ❤️</h2>
           <p class="caption-desc">
-            E assim acaba a espera e começa a nossa vida juntos! Um lar perfeito para a nossa história de amor.
+            E assim acaba a obra e começa o nosso futuro! Um espaço feito com dedicação, rigor profissional e muito amor.
           </p>
           <div class="caption-final-btn">
-            <button id="btn-replay" class="btn-gold">
+            <button id="btn-replay" class="btn-brand">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
                 <path d="M3 3v5h5"></path>
               </svg>
-              <span>Ver Novamente desde o Início</span>
+              <span>Ver Novamente</span>
             </button>
+            <a href="https://autentifuturo.pt" target="_blank" rel="noopener" class="btn-secondary-link">
+              <span>Fazer Remodelação com Autentifuturo →</span>
+            </a>
           </div>
         </div>
       </article>
 
     </div>
 
-    <!-- Celebration Particles (Hearts and Sparkles) -->
+    <!-- Celebration Particles (Hearts and Gold Sparkles) -->
     <canvas id="particles-canvas" class="particles-canvas"></canvas>
 
-    <!-- Bottom Video Player Controls Bar -->
+    <!-- Bottom Video Player Controls Bar (Autentifuturo Theme) -->
     <div class="video-bar">
       <!-- Play/Pause Big Button -->
-      <button id="btn-play-pause" class="btn-play" title="Reproduzir vídeo">
+      <button id="btn-play-pause" class="btn-play" title="Reproduzir vídeo da transformação">
         <svg id="icon-play-btn" class="icon-play-svg" viewBox="0 0 24 24" fill="currentColor">
           <polygon points="6 3 20 12 6 21 6 3"></polygon>
         </svg>
@@ -203,7 +216,7 @@
       <!-- Video Timeline Scrubber -->
       <div class="video-scrubber-area">
         <div class="scrubber-header">
-          <span id="player-status-tag" class="status-tag">A sala está velha</span>
+          <span id="player-status-tag" class="status-tag">A sala está velha...</span>
           <span id="player-time-text" class="time-tag">Fase 1 de 7</span>
         </div>
         <div class="scrubber-track-container" id="scrubber-track-box">
@@ -238,7 +251,7 @@
 
   </div>
 
-  <!-- SCROLL DRIVER TRACK (Creates native scrollable body so mouse wheel and touch naturally drive the video) -->
+  <!-- SCROLL DRIVER TRACK (Enables smooth native mouse wheel and touch scroll) -->
   <div class="scroll-driver" id="scroll-driver"></div>
 
   <!-- Before & After Comparison Modal -->
@@ -246,7 +259,10 @@
     <div class="modal-dim" id="compare-modal-dim"></div>
     <div class="compare-card">
       <div class="compare-header">
-        <h3>Comparação: Antes (Sala Velha) vs. Depois (Nosso Lar)</h3>
+        <div class="compare-brand-title">
+          <img src="logo-autentifuturo.webp" alt="Autentifuturo" class="modal-logo">
+          <h3>Comparação: Antes (Sala Velha) vs. Depois (Lar Concluído)</h3>
+        </div>
         <button id="btn-close-compare" class="btn-modal-close" aria-label="Fechar">✕</button>
       </div>
       <div class="compare-frame" id="compare-frame">
@@ -265,7 +281,10 @@
           </div>
         </div>
       </div>
-      <p class="compare-tip">Arrasta para comparar a transformação de ponta a ponta.</p>
+      <div class="compare-footer-info">
+        <p class="compare-tip">Arrasta para comparar a transformação realizada pela Autentifuturo.</p>
+        <a href="https://autentifuturo.pt" target="_blank" rel="noopener" class="compare-link">autentifuturo.pt</a>
+      </div>
     </div>
   </div>
 
