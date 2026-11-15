@@ -1,0 +1,854 @@
+/* ==========================================================================
+   A NOSSA TRANSFORMAÇÃO — STYLES
+   Fixed Fullscreen Video Experience with Scroll Scrubbing
+   ========================================================================== */
+
+:root {
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-serif: 'Playfair Display', Georgia, serif;
+  
+  --bg-dark: #07090e;
+  --text-main: #f9fafb;
+  --text-muted: #9ca3af;
+  --accent-blue: #3b82f6;
+  --accent-gold: #f59e0b;
+  --accent-love: #ec4899;
+  
+  --glass-bg: rgba(12, 15, 24, 0.78);
+  --glass-border: rgba(255, 255, 255, 0.14);
+  --shadow-lg: 0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 25px rgba(255, 255, 255, 0.04);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ==========================================================================
+   FIXED VIEWPORT (Locked permanently at the top of the screen)
+   ========================================================================== */
+.fixed-viewport {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 10;
+  overflow: hidden;
+  background-color: #000;
+  user-select: none;
+}
+
+/* Canvas Video Renderer */
+.video-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Cinematic Contrast Overlay */
+.viewport-overlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(0, 0, 0, 0.1) 0%, rgba(7, 9, 14, 0.65) 100%),
+              linear-gradient(180deg, rgba(7, 9, 14, 0.5) 0%, transparent 25%, transparent 70%, rgba(7, 9, 14, 0.85) 100%);
+  pointer-events: none;
+}
+
+/* Particles Canvas */
+.particles-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 15;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+
+.particles-canvas.active {
+  opacity: 1;
+}
+
+/* ==========================================================================
+   Top Header Navigation
+   ========================================================================== */
+.top-nav {
+  position: absolute;
+  top: 18px;
+  left: 24px;
+  right: 24px;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.brand {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 18px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: 9999px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.brand-sparkle {
+  font-size: 1.1rem;
+}
+
+.brand-title {
+  font-family: var(--font-serif);
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+.nav-actions {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  color: var(--text-main);
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.nav-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.nav-btn.icon-only {
+  padding: 8px;
+}
+
+.icon {
+  width: 16px;
+  height: 16px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* ==========================================================================
+   Side Chapter Timeline
+   ========================================================================== */
+.side-timeline {
+  position: absolute;
+  right: 28px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 25;
+}
+
+.timeline-dots {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.timeline-dot-item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.timeline-dot-name {
+  opacity: 0;
+  pointer-events: none;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(12, 15, 24, 0.9);
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--glass-border);
+  transform: translateX(10px);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.timeline-dot-item:hover .timeline-dot-name {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.timeline-dot-core {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  border: 2px solid #07090e;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.timeline-dot-item.active .timeline-dot-core {
+  background: #3b82f6;
+  transform: scale(1.6);
+  box-shadow: 0 0 16px #3b82f6;
+}
+
+.timeline-dot-item.done .timeline-dot-core {
+  background: #ec4899;
+}
+
+/* ==========================================================================
+   Story Center Stage & Caption Cards
+   ========================================================================== */
+.story-center-stage {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+  padding: 0 8vw;
+}
+
+.caption-card {
+  position: absolute;
+  max-width: 540px;
+  width: calc(100% - 16vw);
+  opacity: 0;
+  transform: translateY(25px) scale(0.96);
+  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+.caption-card.active {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.caption-glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  padding: 34px 38px;
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+.caption-glass::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+}
+
+.caption-glass.love {
+  border-color: rgba(236, 72, 153, 0.4);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(236, 72, 153, 0.25);
+}
+
+.caption-glass.love::before {
+  background: linear-gradient(90deg, transparent, #ec4899, transparent);
+}
+
+.caption-glass.celebration {
+  border-color: rgba(245, 158, 11, 0.45);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 50px rgba(245, 158, 11, 0.3);
+}
+
+.caption-glass.celebration::before {
+  background: linear-gradient(90deg, transparent, #fbbf24, transparent);
+}
+
+/* Card Elements */
+.caption-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #93c5fd;
+  margin-bottom: 14px;
+  background: rgba(59, 130, 246, 0.12);
+  padding: 4px 12px;
+  border-radius: 9999px;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.badge-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #3b82f6;
+  box-shadow: 0 0 8px #3b82f6;
+}
+
+.badge-dot.warning { background: #f59e0b; box-shadow: 0 0 8px #f59e0b; }
+.badge-dot.success { background: #10b981; box-shadow: 0 0 8px #10b981; }
+.badge-dot.modern { background: #8b5cf6; box-shadow: 0 0 8px #8b5cf6; }
+
+.caption-badge.warning { color: #fcd34d; background: rgba(245, 158, 11, 0.12); border-color: rgba(245, 158, 11, 0.3); }
+.caption-badge.success { color: #6ee7b7; background: rgba(16, 185, 129, 0.12); border-color: rgba(16, 185, 129, 0.3); }
+.caption-badge.modern { color: #c4b5fd; background: rgba(139, 92, 246, 0.12); border-color: rgba(139, 92, 246, 0.3); }
+.caption-badge.love { color: #f472b6; background: rgba(236, 72, 153, 0.15); border-color: rgba(236, 72, 153, 0.4); }
+.caption-badge.gold { color: #fde68a; background: rgba(245, 158, 11, 0.18); border-color: rgba(245, 158, 11, 0.4); }
+
+.caption-title {
+  font-family: var(--font-serif);
+  font-size: 2.2rem;
+  line-height: 1.18;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 14px;
+}
+
+.caption-desc {
+  font-size: 1.02rem;
+  line-height: 1.6;
+  color: #d1d5db;
+}
+
+.caption-action-hint {
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.scroll-indicator {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #93c5fd;
+}
+
+.mouse-icon {
+  width: 18px;
+  height: 26px;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-radius: 9px;
+  display: flex;
+  justify-content: center;
+  padding-top: 4px;
+}
+
+.mouse-wheel {
+  width: 3px;
+  height: 6px;
+  background: #fff;
+  border-radius: 2px;
+  animation: scrollAnim 1.6s ease-in-out infinite;
+}
+
+@keyframes scrollAnim {
+  0% { transform: translateY(0); opacity: 1; }
+  80% { transform: translateY(9px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 0; }
+}
+
+.caption-final-btn {
+  margin-top: 22px;
+}
+
+.btn-gold {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  border: none;
+  border-radius: 9999px;
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #07090e;
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(245, 158, 11, 0.45);
+  transition: all 0.25s ease;
+}
+
+.btn-gold svg {
+  width: 16px;
+  height: 16px;
+}
+
+.btn-gold:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(245, 158, 11, 0.65);
+}
+
+/* ==========================================================================
+   Bottom Video Player Controls Bar
+   ========================================================================== */
+.video-bar {
+  position: absolute;
+  bottom: 22px;
+  left: 24px;
+  right: 24px;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 12px 22px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--glass-border);
+  border-radius: 9999px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.55);
+}
+
+/* Big Play Button */
+.btn-play {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 22px;
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 9999px;
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #ffffff;
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(37, 99, 235, 0.45);
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+
+.btn-play:hover {
+  background: linear-gradient(135deg, #1d4ed8, #2563eb);
+  box-shadow: 0 6px 24px rgba(37, 99, 235, 0.65);
+  transform: translateY(-1px);
+}
+
+.btn-play.playing {
+  background: linear-gradient(135deg, #e11d48, #f43f5e);
+  box-shadow: 0 4px 18px rgba(225, 29, 72, 0.45);
+}
+
+.icon-play-svg, .icon-pause-svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Scrubber Area */
+.video-scrubber-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.scrubber-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.8rem;
+}
+
+.status-tag {
+  font-weight: 700;
+  color: #93c5fd;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 320px;
+}
+
+.time-tag {
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.scrubber-track-container {
+  position: relative;
+  width: 100%;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.scrubber-track-bg {
+  position: relative;
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.16);
+  border-radius: 6px;
+}
+
+.scrubber-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #3b82f6, #ec4899);
+  border-radius: 6px;
+}
+
+.scrubber-head {
+  position: absolute;
+  top: 50%;
+  left: 0%;
+  transform: translate(-50%, -50%);
+  width: 16px;
+  height: 16px;
+  background: #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.9), 0 2px 6px rgba(0, 0, 0, 0.5);
+  transition: transform 0.1s ease;
+}
+
+.scrubber-track-container:hover .scrubber-head {
+  transform: translate(-50%, -50%) scale(1.3);
+}
+
+.scrubber-ticks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.tick {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 4px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+}
+
+.tick.active {
+  background: #3b82f6;
+  box-shadow: 0 0 6px #3b82f6;
+}
+
+/* Step Nav */
+.step-buttons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-step {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--glass-border);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.btn-step svg {
+  width: 18px;
+  height: 18px;
+}
+
+.btn-step:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.08);
+}
+
+/* ==========================================================================
+   SCROLL DRIVER TRACK (Creates document height for native wheel & touch scroll)
+   ========================================================================== */
+.scroll-driver {
+  position: relative;
+  width: 100%;
+  height: 600vh;
+  pointer-events: none;
+  opacity: 0;
+}
+
+/* ==========================================================================
+   Before vs After Comparison Modal
+   ========================================================================== */
+.compare-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.25s ease;
+}
+
+.compare-modal.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-dim {
+  position: absolute;
+  inset: 0;
+  background: rgba(3, 5, 10, 0.88);
+  backdrop-filter: blur(14px);
+}
+
+.compare-card {
+  position: relative;
+  z-index: 2;
+  width: 90vw;
+  max-width: 980px;
+  background: #0f131d;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  padding: 22px;
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.9);
+}
+
+.compare-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.compare-header h3 {
+  font-family: var(--font-serif);
+  font-size: 1.35rem;
+  color: #fff;
+}
+
+.btn-modal-close {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.btn-modal-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.compare-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: col-resize;
+  user-select: none;
+}
+
+.compare-pic {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.compare-pic-before-wrap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 50%;
+  overflow: hidden;
+}
+
+.compare-pic-before-wrap .compare-pic {
+  width: 100%;
+  min-width: 90vw;
+  max-width: 980px;
+}
+
+.compare-chip {
+  position: absolute;
+  bottom: 14px;
+  padding: 6px 14px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-radius: 9999px;
+  backdrop-filter: blur(8px);
+  pointer-events: none;
+}
+
+.chip-before {
+  left: 14px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #93c5fd;
+}
+
+.chip-after {
+  right: 14px;
+  background: rgba(245, 158, 11, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #07090e;
+}
+
+.compare-splitter {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  background: #ffffff;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.compare-knob {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 38px;
+  height: 38px;
+  background: #ffffff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #07090e;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+}
+
+.compare-knob svg {
+  width: 18px;
+  height: 18px;
+}
+
+.compare-tip {
+  text-align: center;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin-top: 12px;
+}
+
+/* ==========================================================================
+   Responsive Adaptations
+   ========================================================================== */
+@media (max-width: 860px) {
+  .top-nav {
+    top: 12px;
+    left: 12px;
+    right: 12px;
+  }
+  
+  .brand-title {
+    display: none;
+  }
+
+  .side-timeline {
+    display: none;
+  }
+
+  .story-center-stage {
+    padding: 0 16px;
+    align-items: flex-end;
+    bottom: 95px;
+  }
+
+  .caption-card {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .caption-glass {
+    padding: 20px 18px;
+    border-radius: 14px;
+  }
+
+  .caption-title {
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+  }
+
+  .caption-desc {
+    font-size: 0.9rem;
+    line-height: 1.45;
+  }
+
+  .video-bar {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    padding: 10px 16px;
+    gap: 12px;
+  }
+
+  .status-tag {
+    max-width: 160px;
+  }
+
+  .btn-play {
+    padding: 8px 16px;
+    font-size: 0.82rem;
+  }
+}
