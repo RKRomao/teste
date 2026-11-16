@@ -73,7 +73,7 @@ let particlesAnimId = null;
 // 1. Image Preloading & Canvas Resize
 // ==========================================================================
 function resizeCanvas() {
-  const dpr = window.devicePixelRatio || 1;
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
   const w = window.innerWidth;
   const h = window.innerHeight;
 
@@ -251,7 +251,7 @@ function onWindowScroll() {
   updateUI(currentFloatStep);
 }
 
-// Direct wheel listener on fixed viewport ensures instant response
+// Direct wheel listener on desktop ensures instant response
 window.addEventListener('wheel', (e) => {
   if (isPlaying) stopVideo();
   const delta = e.deltaY;
@@ -260,25 +260,41 @@ window.addEventListener('wheel', (e) => {
   setPosition(newPos, true);
 }, { passive: true });
 
-// Touch swipe support for mobile
+// Mobile Touch gestures: Smooth vertical scroll + horizontal swipe to navigate chapters
+let touchStartX = 0;
 let touchStartY = 0;
+let touchMoved = false;
+
 window.addEventListener('touchstart', (e) => {
   if (isPlaying) stopVideo();
   if (e.touches && e.touches[0]) {
+    touchStartX = e.touches[0].clientX;
     touchStartY = e.touches[0].clientY;
+    touchMoved = false;
   }
 }, { passive: true });
 
 window.addEventListener('touchmove', (e) => {
-  if (isPlaying) stopVideo();
-  if (!e.touches || !e.touches[0]) return;
-  const currentY = e.touches[0].clientY;
-  const diffY = touchStartY - currentY;
-  touchStartY = currentY;
+  touchMoved = true;
+}, { passive: true });
 
-  const stepIncrement = (diffY / 250);
-  const newPos = Math.max(0, Math.min(currentFloatStep + stepIncrement, CHAPTERS.length - 1));
-  setPosition(newPos, true);
+window.addEventListener('touchend', (e) => {
+  if (!touchMoved || !e.changedTouches || !e.changedTouches[0]) return;
+  const deltaX = e.changedTouches[0].clientX - touchStartX;
+  const deltaY = e.changedTouches[0].clientY - touchStartY;
+
+  // Horizontal swipe detection (swipe left = next, swipe right = previous)
+  if (Math.abs(deltaX) > 55 && Math.abs(deltaX) > Math.abs(deltaY) * 1.4) {
+    if (deltaX < 0) {
+      // Swiped Left -> Next Chapter
+      const next = Math.min(CHAPTERS.length - 1, activeStepIndex + 1);
+      setPosition(next, true);
+    } else {
+      // Swiped Right -> Previous Chapter
+      const prev = Math.max(0, activeStepIndex - 1);
+      setPosition(prev, true);
+    }
+  }
 }, { passive: true });
 
 window.addEventListener('scroll', onWindowScroll, { passive: true });
