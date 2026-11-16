@@ -1,6 +1,6 @@
 /**
- * A NOSSA TRANSFORMAÇÃO — SCROLL & VIDEO ENGINE
- * High-performance canvas frame renderer with scroll-driven interpolation
+ * AUTENTIFUTURO — LUXURY SCROLL & VIDEO ENGINE
+ * High-performance frame renderer with Apple-grade smooth scrollytelling
  */
 
 const CHAPTERS = [
@@ -19,11 +19,11 @@ const ctx = canvas.getContext('2d');
 const particlesCanvas = document.getElementById('particles-canvas');
 const pCtx = particlesCanvas.getContext('2d');
 
-const captionCards = Array.from(document.querySelectorAll('.caption-card'));
+const captionItems = Array.from(document.querySelectorAll('.caption-item'));
+const storySegments = Array.from(document.querySelectorAll('.story-segments .segment'));
+const storySegmentsBox = document.getElementById('story-segments');
 const timelineDots = document.getElementById('timeline-dots');
-const scrubberFill = document.getElementById('scrubber-fill');
-const scrubberHead = document.getElementById('scrubber-head');
-const scrubberTrackBox = document.getElementById('scrubber-track-box');
+
 const playerStatusTag = document.getElementById('player-status-tag');
 const playerTimeText = document.getElementById('player-time-text');
 
@@ -48,8 +48,6 @@ const compareFrame = document.getElementById('compare-frame');
 const compareBeforeWrap = document.getElementById('compare-before-wrap');
 const compareSplitter = document.getElementById('compare-splitter');
 
-const btnFullscreen = document.getElementById('btn-fullscreen');
-
 // Preloaded Image Cache
 const imageElements = [];
 let imagesLoaded = 0;
@@ -59,7 +57,7 @@ let currentFloatStep = 0.0; // 0.0 to 6.0
 let activeStepIndex = 0;
 let isPlaying = false;
 let playAnimFrameId = null;
-let playSpeed = 0.007; // speed of video playback
+let playSpeed = 0.007;
 let isSoundOn = false;
 let audioCtx = null;
 let ambientGain = null;
@@ -102,7 +100,6 @@ function loadAllImages() {
       }
     };
     imageElements[idx] = img;
-    // In case image is already cached synchronously
     if (img.complete && img.naturalWidth > 0 && idx === 0) {
       renderFrame(0);
     }
@@ -141,7 +138,7 @@ function drawCoverImage(img, alpha = 1.0, scale = 1.0) {
 }
 
 function renderFrame(floatPos) {
-  const maxStep = CHAPTERS.length - 1; // 6
+  const maxStep = CHAPTERS.length - 1;
   const clampedPos = Math.max(0, Math.min(floatPos, maxStep));
   const baseIndex = Math.min(Math.floor(clampedPos), maxStep - 1);
   const nextIndex = Math.min(baseIndex + 1, maxStep);
@@ -152,13 +149,11 @@ function renderFrame(floatPos) {
   const imgBase = imageElements[baseIndex];
   const imgNext = imageElements[nextIndex];
 
-  // Draw base image
   if (imgBase && imgBase.complete) {
     const scaleBase = 1.0 + (1 - progressBetween) * 0.02;
     drawCoverImage(imgBase, 1.0, scaleBase);
   }
 
-  // Draw overlay image with interpolated alpha
   if (imgNext && imgNext.complete && progressBetween > 0.001) {
     const scaleNext = 1.0 + progressBetween * 0.02;
     drawCoverImage(imgNext, progressBetween, scaleNext);
@@ -168,49 +163,57 @@ function renderFrame(floatPos) {
 }
 
 // ==========================================================================
-// 3. UI Sync (Cards, Timeline, Scrubber)
+// 3. UI Sync (Stories Segments, Captions, Header)
 // ==========================================================================
 function updateUI(floatPos) {
   const maxStep = CHAPTERS.length - 1;
-  const progressRatio = Math.max(0, Math.min(floatPos / maxStep, 1));
+  const clampedPos = Math.max(0, Math.min(floatPos, maxStep));
+  const baseIndex = Math.min(Math.floor(clampedPos), maxStep - 1);
+  const progressBetween = clampedPos - baseIndex;
   const discreteStep = Math.round(floatPos);
 
-  // Update scrubber bar
-  scrubberFill.style.width = (progressRatio * 100) + '%';
-  scrubberHead.style.left = (progressRatio * 100) + '%';
-
-  // Update time/status text
-  const currentChapter = CHAPTERS[discreteStep] || CHAPTERS[0];
-  playerStatusTag.textContent = currentChapter.title;
-  playerTimeText.textContent = `Fase ${discreteStep + 1} de ${CHAPTERS.length}`;
-
-  // Update tick marks
-  const ticks = document.querySelectorAll('.tick');
-  ticks.forEach((tick, i) => {
-    tick.classList.toggle('active', i <= discreteStep);
+  // 1. Update 7-segment stories progress bar
+  storySegments.forEach((seg, idx) => {
+    const fill = seg.querySelector('.seg-fill');
+    if (idx < baseIndex) {
+      seg.className = 'segment completed';
+      if (fill) fill.style.width = '100%';
+    } else if (idx === baseIndex) {
+      seg.className = 'segment active';
+      if (fill) fill.style.width = (progressBetween * 100).toFixed(1) + '%';
+    } else {
+      seg.className = 'segment';
+      if (fill) fill.style.width = '0%';
+    }
   });
 
-  // Update Caption Cards
+  // 2. Update phase indicator
+  const currentChapter = CHAPTERS[discreteStep] || CHAPTERS[0];
+  if (playerStatusTag) playerStatusTag.textContent = currentChapter.title;
+  if (playerTimeText) playerTimeText.textContent = `0${discreteStep + 1} / 07`;
+
+  // 3. Update Captions on discrete step change
   if (discreteStep !== activeStepIndex) {
     activeStepIndex = discreteStep;
-    captionCards.forEach((card, idx) => {
-      card.classList.toggle('active', idx === discreteStep);
+
+    captionItems.forEach((item, idx) => {
+      item.classList.toggle('active', idx === discreteStep);
     });
 
-    // Update side timeline dots
-    const dotItems = document.querySelectorAll('.timeline-dot-item');
+    // Update side dots (desktop)
+    const dotItems = document.querySelectorAll('.side-dot-item');
     dotItems.forEach((dot, idx) => {
       dot.classList.toggle('active', idx === discreteStep);
       dot.classList.toggle('done', idx < discreteStep);
     });
 
-    // Audio chime on new milestone reached
+    // Audio chime on milestone change
     if (discreteStep !== lastChimeStep) {
       lastChimeStep = discreteStep;
       playStepChime(discreteStep);
     }
 
-    // Toggle romantic particles for casar & lar final
+    // Toggle romantic particles for casar & final home
     if (discreteStep >= 5) {
       particlesCanvas.classList.add('active');
     } else {
@@ -219,7 +222,6 @@ function updateUI(floatPos) {
   }
 }
 
-// Sets the current position and updates both canvas and UI
 function setPosition(floatPos, syncScroll = true) {
   const maxStep = CHAPTERS.length - 1;
   currentFloatStep = Math.max(0, Math.min(floatPos, maxStep));
@@ -236,10 +238,10 @@ function setPosition(floatPos, syncScroll = true) {
 }
 
 // ==========================================================================
-// 4. Scroll Driver (Mouse Wheel, Touch, Page Scroll)
+// 4. Scroll Driver (Native Scroll & Wheel)
 // ==========================================================================
 function onWindowScroll() {
-  if (isPlaying) return; // Video player controls the progress when active
+  if (isPlaying) return;
 
   const scrollMax = document.documentElement.scrollHeight - window.innerHeight;
   if (scrollMax <= 0) return;
@@ -251,7 +253,7 @@ function onWindowScroll() {
   updateUI(currentFloatStep);
 }
 
-// Direct wheel listener on desktop ensures instant response
+// Wheel listener for desktop
 window.addEventListener('wheel', (e) => {
   if (isPlaying) stopVideo();
   const delta = e.deltaY;
@@ -260,7 +262,7 @@ window.addEventListener('wheel', (e) => {
   setPosition(newPos, true);
 }, { passive: true });
 
-// Mobile Touch gestures: Smooth vertical scroll + horizontal swipe to navigate chapters
+// Mobile Touch Gestures: Horizontal swipe to jump chapters
 let touchStartX = 0;
 let touchStartY = 0;
 let touchMoved = false;
@@ -283,8 +285,8 @@ window.addEventListener('touchend', (e) => {
   const deltaX = e.changedTouches[0].clientX - touchStartX;
   const deltaY = e.changedTouches[0].clientY - touchStartY;
 
-  // Horizontal swipe detection (swipe left = next, swipe right = previous)
-  if (Math.abs(deltaX) > 55 && Math.abs(deltaX) > Math.abs(deltaY) * 1.4) {
+  // Horizontal swipe detection
+  if (Math.abs(deltaX) > 50 && Math.abs(deltaX) > Math.abs(deltaY) * 1.3) {
     if (deltaX < 0) {
       // Swiped Left -> Next Chapter
       const next = Math.min(CHAPTERS.length - 1, activeStepIndex + 1);
@@ -299,17 +301,32 @@ window.addEventListener('touchend', (e) => {
 
 window.addEventListener('scroll', onWindowScroll, { passive: true });
 
+// Tap on progress bar segments
+if (storySegmentsBox) {
+  function handleSegmentTap(e) {
+    const rect = storySegmentsBox.getBoundingClientRect();
+    const clientX = e.clientX || (e.touches && e.touches[0].clientX) || 0;
+    const ratio = Math.max(0, Math.min((clientX - rect.left) / rect.width, 1));
+    setPosition(ratio * (CHAPTERS.length - 1), true);
+  }
+
+  storySegmentsBox.addEventListener('click', handleSegmentTap);
+  storySegmentsBox.addEventListener('touchstart', (e) => {
+    stopVideo();
+    handleSegmentTap(e);
+  }, { passive: true });
+}
+
 // ==========================================================================
-// 5. Video Player Engine (Play / Pause / Loop)
+// 5. Video Player Engine (Play / Pause)
 // ==========================================================================
 function startVideo() {
   isPlaying = true;
   btnPlayPause.classList.add('playing');
   iconPlayBtn.classList.add('hidden');
   iconPauseBtn.classList.remove('hidden');
-  labelPlayText.textContent = 'Pausar';
+  labelPlayText.textContent = 'Pausa';
 
-  // If already at end, start from 0
   if (currentFloatStep >= (CHAPTERS.length - 1) - 0.05) {
     setPosition(0, true);
   }
@@ -340,18 +357,13 @@ function stopVideo() {
   btnPlayPause.classList.remove('playing');
   iconPlayBtn.classList.remove('hidden');
   iconPauseBtn.classList.add('hidden');
-  labelPlayText.textContent = 'Reproduzir Vídeo';
+  labelPlayText.textContent = 'Ver Vídeo';
 }
 
 btnPlayPause.addEventListener('click', () => {
-  if (isPlaying) {
-    stopVideo();
-  } else {
-    startVideo();
-  }
+  if (isPlaying) stopVideo(); else startVideo();
 });
 
-// Replay Button
 if (btnReplay) {
   btnReplay.addEventListener('click', () => {
     stopVideo();
@@ -360,7 +372,6 @@ if (btnReplay) {
   });
 }
 
-// Next / Prev Step buttons
 btnStepPrev.addEventListener('click', () => {
   stopVideo();
   const prev = Math.max(0, activeStepIndex - 1);
@@ -374,61 +385,21 @@ btnStepNext.addEventListener('click', () => {
 });
 
 // ==========================================================================
-// 6. Scrubber Timeline Interaction
-// ==========================================================================
-let isScrubbing = false;
-
-function handleScrub(e) {
-  const rect = scrubberTrackBox.getBoundingClientRect();
-  const clientX = e.clientX || (e.touches && e.touches[0].clientX) || 0;
-  const ratio = Math.max(0, Math.min((clientX - rect.left) / rect.width, 1));
-  const targetFloat = ratio * (CHAPTERS.length - 1);
-  setPosition(targetFloat, true);
-}
-
-scrubberTrackBox.addEventListener('mousedown', (e) => {
-  stopVideo();
-  isScrubbing = true;
-  handleScrub(e);
-});
-
-window.addEventListener('mousemove', (e) => {
-  if (isScrubbing) handleScrub(e);
-});
-
-window.addEventListener('mouseup', () => {
-  isScrubbing = false;
-});
-
-scrubberTrackBox.addEventListener('touchstart', (e) => {
-  stopVideo();
-  isScrubbing = true;
-  handleScrub(e);
-}, { passive: true });
-
-window.addEventListener('touchmove', (e) => {
-  if (isScrubbing) handleScrub(e);
-}, { passive: true });
-
-window.addEventListener('touchend', () => {
-  isScrubbing = false;
-});
-
-// ==========================================================================
-// 7. Side Chapter Timeline Dots
+// 6. Side Nav Timeline (Desktop)
 // ==========================================================================
 function buildSideTimeline() {
+  if (!timelineDots) return;
   timelineDots.innerHTML = '';
   CHAPTERS.forEach((ch, idx) => {
     const li = document.createElement('li');
     const btn = document.createElement('button');
-    btn.className = 'timeline-dot-item' + (idx === 0 ? ' active' : '');
+    btn.className = 'side-dot-item' + (idx === 0 ? ' active' : '');
     btn.dataset.step = idx;
     btn.setAttribute('aria-label', ch.title);
 
     btn.innerHTML = `
-      <span class="timeline-dot-name">${ch.short}</span>
-      <span class="timeline-dot-core"></span>
+      <span class="side-dot-name">${ch.short}</span>
+      <span class="side-dot-pip"></span>
     `;
 
     btn.addEventListener('click', () => {
@@ -441,9 +412,7 @@ function buildSideTimeline() {
   });
 }
 
-// ==========================================================================
-// 8. Keyboard Controls
-// ==========================================================================
+// Keyboard navigation
 window.addEventListener('keydown', (e) => {
   if (e.key === ' ' || e.key === 'Spacebar') {
     e.preventDefault();
@@ -460,20 +429,7 @@ window.addEventListener('keydown', (e) => {
 });
 
 // ==========================================================================
-// 9. Fullscreen Toggle
-// ==========================================================================
-if (btnFullscreen) {
-  btnFullscreen.addEventListener('click', () => {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(() => {});
-    } else {
-      document.exitFullscreen().catch(() => {});
-    }
-  });
-}
-
-// ==========================================================================
-// 10. Direct Before vs After Comparison Modal
+// 7. Direct Before vs After Modal
 // ==========================================================================
 function openCompare() {
   stopVideo();
@@ -534,7 +490,7 @@ window.addEventListener('touchend', () => {
 });
 
 // ==========================================================================
-// 11. Web Audio Atmosphere & Chimes
+// 8. Web Audio Atmosphere & Chimes
 // ==========================================================================
 function getAudioContext() {
   if (!audioCtx) {
@@ -575,11 +531,11 @@ function startSoundtrack() {
 
     const osc1 = audioCtx.createOscillator();
     osc1.type = 'triangle';
-    osc1.frequency.setValueAtTime(130.81, audioCtx.currentTime); // C3
+    osc1.frequency.setValueAtTime(130.81, audioCtx.currentTime);
 
     const osc2 = audioCtx.createOscillator();
     osc2.type = 'sine';
-    osc2.frequency.setValueAtTime(196.00, audioCtx.currentTime); // G3
+    osc2.frequency.setValueAtTime(196.00, audioCtx.currentTime);
 
     osc1.connect(filter);
     osc2.connect(filter);
@@ -623,19 +579,19 @@ function playStepChime(step) {
 }
 
 // ==========================================================================
-// 12. Floating Hearts & Particles for Final Chapters
+// 9. Floating Hearts & Particles
 // ==========================================================================
 function initParticles() {
-  const count = 35;
+  const count = 30;
   particles = [];
 
   for (let i = 0; i < count; i++) {
     particles.push({
       x: Math.random() * window.innerWidth,
       y: Math.random() * window.innerHeight,
-      size: Math.random() * 12 + 6,
-      speedY: Math.random() * 0.8 + 0.3,
-      speedX: (Math.random() - 0.5) * 0.5,
+      size: Math.random() * 10 + 5,
+      speedY: Math.random() * 0.7 + 0.3,
+      speedX: (Math.random() - 0.5) * 0.4,
       opacity: Math.random() * 0.5 + 0.2,
       isHeart: Math.random() > 0.4
     });
@@ -669,7 +625,7 @@ function initParticles() {
         } else {
           pCtx.beginPath();
           pCtx.arc(p.x, p.y, p.size * 0.3, 0, Math.PI * 2);
-          pCtx.fillStyle = `rgba(251, 191, 36, ${p.opacity})`;
+          pCtx.fillStyle = `rgba(212, 175, 55, ${p.opacity})`;
           pCtx.fill();
         }
 
@@ -687,7 +643,7 @@ function initParticles() {
 }
 
 // ==========================================================================
-// 13. Initialization on Load
+// 10. Startup
 // ==========================================================================
 window.addEventListener('DOMContentLoaded', () => {
   buildSideTimeline();
